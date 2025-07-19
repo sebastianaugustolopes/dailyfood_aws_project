@@ -2,11 +2,12 @@ import { z } from "zod";
 
 import { HttpRequest, HttpResponse } from "../types/Http";
 import { badRequest, conflict, created } from "../utils/http";
-import {hash} from 'bcryptjs';
+import { hash } from "bcryptjs";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
 import { usersTable } from "../db/schema";
 import { signAccessTokenFor } from "../lib/hwt";
+import { calculateGoals } from "../lib/calculatorGoals";
 
 const schema = z.object({
   goal: z.enum(["lose", "maintain", "gain"]),
@@ -42,28 +43,36 @@ export class SignUpController {
     }
 
     const { account, ...rest } = data;
-    const hashsedPassword = await hash(account.password, 8)
 
+    const goals = calculateGoals({
+      activityLevel: rest.activityLevel,
+      birthDate: rest.birthDate, 
+      gender: rest.gender,
+      goal: rest.goal,
+      height: rest.height,
+      weight: rest.weight,
+    });
+
+    const hashsedPassword = await hash(account.password, 8); 
+    
     const [user] = await db
       .insert(usersTable)
       .values({
         ...account,
         ...rest,
+        ...goals,
         password: hashsedPassword,
-        birthDate: rest.birthDate.toISOString(), // ensure birthDate is a string
-        calories: 0,
-        carbohydrates: 0,
-        fats: 0,
-        proteins: 0,
+        birthDate: rest.birthDate.toISOString().split("T")[0], 
       })
       .returning({
         id: usersTable.id,
       });
+    
 
-    const accessToken = signAccessTokenFor(user.id)
+    const accessToken = signAccessTokenFor(user.id);
 
     return created({
-      accessToken
+      accessToken,
     });
   }
 }
