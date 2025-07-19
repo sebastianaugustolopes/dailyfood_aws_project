@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import { sign } from "jsonwebtoken";
 import { usersTable } from "../db/schema";
 import { compare } from "bcryptjs";
-import { signAccessToken, signAccessTokenFor } from "../lib/hwt";
+import { signAccessTokenFor } from "../lib/jwt";
 
 const schema = z.object({
   email: z.email(),
@@ -41,7 +41,7 @@ export class SignInController {
       return unauthorized({ error: "Invalid credentials" });
     }
 
-    const accessToken = signAccessTokenFor(user.id)
+    const accessToken = signAccessTokenFor(user.id);
 
     return ok({
       accessToken,

@@ -6,7 +6,7 @@ import { hash } from "bcryptjs";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
 import { usersTable } from "../db/schema";
-import { signAccessTokenFor } from "../lib/hwt";
+import { signAccessTokenFor } from "../lib/jwt";
 import { calculateGoals } from "../lib/calculatorGoals";
 
 const schema = z.object({
@@ -46,15 +46,15 @@ export class SignUpController {
 
     const goals = calculateGoals({
       activityLevel: rest.activityLevel,
-      birthDate: rest.birthDate, 
+      birthDate: rest.birthDate,
       gender: rest.gender,
       goal: rest.goal,
       height: rest.height,
       weight: rest.weight,
     });
 
-    const hashsedPassword = await hash(account.password, 8); 
-    
+    const hashsedPassword = await hash(account.password, 8);
+
     const [user] = await db
       .insert(usersTable)
       .values({
@@ -62,12 +62,11 @@ export class SignUpController {
         ...rest,
         ...goals,
         password: hashsedPassword,
-        birthDate: rest.birthDate.toISOString().split("T")[0], 
+        birthDate: rest.birthDate.toISOString().split("T")[0],
       })
       .returning({
         id: usersTable.id,
       });
-    
 
     const accessToken = signAccessTokenFor(user.id);
 
