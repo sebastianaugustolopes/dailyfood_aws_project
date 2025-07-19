@@ -9,6 +9,8 @@ provider:
   name: aws
   runtime: nodejs22.x
   architecture: arm64
+  environment:
+    DATABASE_URL: ${env:DATABASE_URL}
 
 package:
   individually: true
