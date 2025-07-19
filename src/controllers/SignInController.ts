@@ -1,11 +1,13 @@
 import { z } from "zod";
 
 import { HttpRequest, HttpResponse } from "../types/Http";
-import { badRequest, created, ok, unauthorized } from "../utils/http";
+import { badRequest, ok, unauthorized } from "../utils/http";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
+import { sign } from "jsonwebtoken";
 import { usersTable } from "../db/schema";
 import { compare } from "bcryptjs";
+import { signAccessToken, signAccessTokenFor } from "../lib/hwt";
 
 const schema = z.object({
   email: z.email(),
@@ -30,18 +32,19 @@ export class SignInController {
     });
 
     if (!user) {
-      return unauthorized({ error: 'Invalid credentials' });
+      return unauthorized({ error: "Invalid credentials" });
     }
 
     const isPasswordValid = await compare(data.password, user.password);
 
     if (!isPasswordValid) {
-      return unauthorized({ error: 'Invalid credentials' });
+      return unauthorized({ error: "Invalid credentials" });
     }
 
-    // Aqui você pode gerar token, se quiser
+    const accessToken = signAccessTokenFor(user.id)
+
     return ok({
-      userId: user.id,
+      accessToken,
     });
   }
 }

@@ -1,4 +1,3 @@
-
 org: ssebastianaugusto
 service: foodiary-api
 
@@ -11,14 +10,10 @@ provider:
   architecture: arm64
   environment:
     DATABASE_URL: ${env:DATABASE_URL}
+    JWT_SECRET: ${env:JWT_SECRET}
 
 package:
   individually: true
-
-build:
-  esbuild:
-    minify: true
-    sourcemap: false
 
 functions:
   signin:
@@ -34,4 +29,12 @@ functions:
       - httpApi:
           path: /signup
           method: POST
-  
+
+custom:
+  esbuild:
+    bundle: true
+    minify: true
+    sourcemap: false
+    target: node22
+    platform: node
+    concurrency: 10

@@ -6,6 +6,7 @@ import {hash} from 'bcryptjs';
 import { db } from "../db";
 import { eq } from "drizzle-orm";
 import { usersTable } from "../db/schema";
+import { signAccessTokenFor } from "../lib/hwt";
 
 const schema = z.object({
   goal: z.enum(["lose", "maintain", "gain"]),
@@ -59,8 +60,10 @@ export class SignUpController {
         id: usersTable.id,
       });
 
+    const accessToken = signAccessTokenFor(user.id)
+
     return created({
-      userId: user.id,
+      accessToken
     });
   }
 }
