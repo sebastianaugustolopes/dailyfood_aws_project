@@ -2,6 +2,9 @@
 org: ssebastianaugusto
 service: foodiary-api
 
+plugins:
+  - serverless-offline
+
 provider:
   name: aws
   runtime: nodejs22.x
@@ -17,14 +20,14 @@ build:
 
 functions:
   signin:
-    handler: src/signin.handler
+    handler: src/function/signin.handler
     events:
       - httpApi:
-          path: /
+          path: /signin
           method: POST
   
   signup:
-    handler: src/signupj.handler
+    handler: src/function/signup.handler
     events:
       - httpApi:
           path: /signup
