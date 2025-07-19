@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { HttpRequest, HttpResponse } from "../types/Http";
 import { badRequest, conflict, created } from "../utils/http";
+import {hash} from 'bcryptjs';
 import { db } from "../db";
 import { eq } from "drizzle-orm";
 import { usersTable } from "../db/schema";
@@ -40,12 +41,14 @@ export class SignUpController {
     }
 
     const { account, ...rest } = data;
+    const hashsedPassword = await hash(account.password, 8)
 
     const [user] = await db
       .insert(usersTable)
       .values({
         ...account,
         ...rest,
+        password: hashsedPassword,
         birthDate: rest.birthDate.toISOString(), // ensure birthDate is a string
         calories: 0,
         carbohydrates: 0,
