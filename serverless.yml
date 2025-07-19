@@ -1,0 +1,32 @@
+
+org: ssebastianaugusto
+service: foodiary-api
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  architecture: arm64
+
+package:
+  individually: true
+
+build:
+  esbuild:
+    minify: true
+    sourcemap: false
+
+functions:
+  signin:
+    handler: src/signin.handler
+    events:
+      - httpApi:
+          path: /
+          method: POST
+  
+  signup:
+    handler: src/signupj.handler
+    events:
+      - httpApi:
+          path: /signup
+          method: POST
+  
