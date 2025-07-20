@@ -19,8 +19,7 @@ provider:
         - Effect: Allow
           Action:
             - s3:PutObject
-          Resource: !Sub '${UploadsBucket.Arn}/*'
-
+          Resource: !Sub "${UploadsBucket.Arn}/*"
 
 package:
   individually: true
@@ -67,6 +66,15 @@ functions:
       - httpApi:
           method: GET
           path: /meals/{mealId}
+
+  fileUploadedEvent:
+    handler: src/functions/fileUploadedEvent.handler
+    events:
+      - s3:
+          bucket: !Ref UploadsBucket
+          event: s3:ObjectCreated:*
+          existing: true
+          forceDeploy: true
 
 resources:
   Resources:
