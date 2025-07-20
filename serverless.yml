@@ -50,6 +50,13 @@ functions:
       - httpApi:
           path: /meals
           method: GET
+  
+  getMealById:
+    handler: src/functions/getmealsById.handler
+    events:
+      - httpApi:
+        method: GET
+        path: /meals/{mealId}
 
 custom:
   esbuild:
