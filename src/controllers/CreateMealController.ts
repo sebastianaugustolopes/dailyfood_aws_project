@@ -36,7 +36,7 @@ export class CreateMealController {
       .insert(mealsTable)
       .values({
         userId,
-        inputFileKey: 'input_file_key',
+        inputFileKey: 'filekey',
         inputType: data.fileType === 'audio/m4a' ? 'audio' : 'picture',
         status: 'uploading',
         icon: '',
